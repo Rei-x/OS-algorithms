@@ -1,11 +1,13 @@
 import Head from "next/head";
 import { Inter, Lato } from "next/font/google";
-import { useQueue } from "./hooks/useQueue";
+import { useQueue } from "../hooks/useQueue";
 import { Container, HStack, List, Text, VStack } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { Process } from "@/components/Process";
 import { createProcess } from "@/lib/Process";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { QueueList } from "@/components/QueueList";
+import { useSJF } from "@/hooks/useSJF";
 const lato = Lato({
   weight: ["400", "700"],
   subsets: ["latin-ext"],
@@ -13,6 +15,9 @@ const lato = Lato({
 
 export default function Home() {
   const { queue } = useQueue();
+  const { sjf } = useSJF();
+
+  const allQueues = [queue, sjf];
 
   const [parent] = useAutoAnimate();
 
@@ -30,7 +35,10 @@ export default function Home() {
             mr={2}
             onClick={() => {
               const length = Math.floor(Math.random() * 10) + 1;
-              queue.addProcess(createProcess({ length }));
+              allQueues.forEach((queue) => {
+                const process = createProcess({ length });
+                queue.addProcess(process);
+              });
             }}
           >
             Dodaj proces
@@ -38,7 +46,9 @@ export default function Home() {
           {queue.isRunning ? (
             <Button
               onClick={() => {
-                queue.stopQueue();
+                allQueues.forEach((queue) => {
+                  queue.stopQueue();
+                });
               }}
             >
               Zatrzymaj kolejke
@@ -46,25 +56,25 @@ export default function Home() {
           ) : (
             <Button
               onClick={() => {
-                queue.startQueue();
+                allQueues.forEach((queue) => {
+                  queue.startQueue();
+                });
               }}
             >
               Wystartuj kolejke
             </Button>
           )}
         </HStack>
-
-        {queue.currentProcess ? (
-          <>
-            <Text>Obecny proces</Text>
-            <Process process={queue.currentProcess} />
-          </>
-        ) : null}
-        <List spacing={2} ref={parent}>
-          {queue.processes.map((process) => (
-            <Process key={process.pid} process={process} />
-          ))}
-        </List>
+        <HStack spacing={16} alignItems="flex-start">
+          <QueueList queue={queue} name="FCFS" />
+          <QueueList queue={sjf} name="SJF" />
+          <VStack>
+            <Text>SJF (z wywłaszczaniem)</Text>
+          </VStack>
+          <VStack>
+            <Text>RoundRobin</Text>
+          </VStack>
+        </HStack>
       </Container>
     </>
   );
