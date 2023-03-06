@@ -1,12 +1,13 @@
 import { useSnapshot } from "valtio";
 import { createCPU } from "@/lib/CPU";
-import { createSJFNonW } from "@/lib/SJF";
+import { createSJF } from "@/lib/SJF";
 
-const cpuProxy = createCPU({ speed: 1 });
-const queueProxy = createSJFNonW({ cpu: cpuProxy });
+const cpuProxy = createCPU();
+const queueProxy = createSJF(cpuProxy);
 
 export const useSJF = () => {
-  const SJF = useSnapshot(queueProxy);
+  const cpu = useSnapshot(cpuProxy);
+  const sjf = useSnapshot(queueProxy);
 
-  return { SJF };
+  return { cpu, sjf };
 };

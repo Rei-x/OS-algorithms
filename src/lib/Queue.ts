@@ -1,80 +1,86 @@
-import { proxy, subscribe } from "valtio";
+import { proxy } from "valtio";
 import { CPU } from "./CPU";
 import { Process } from "./Process";
+import { waiter } from "./waiter";
 
-export const createQueue = ({ cpu }: { cpu: CPU }) => {
+export const createQueue = (cpu: CPU) => {
   const state = proxy({
+    cpu,
     processes: [] as Process[],
     doneProcesses: [] as Process[],
     isRunning: false,
     currentProcess: null as Process | null,
-    interval: null as NodeJS.Timer | null,
-    subscriptions: [] as (() => void)[],
-    cpu,
-    addProcess(process: Process) {
+    setCurrentProcess: (process: Process) => {
+      state.currentProcess = process;
+    },
+    clearCurrentProcess: () => {
+      state.currentProcess = null;
+    },
+    addProcess: (process: Process) => {
       state.processes.push(process);
     },
-
-    getProcesses() {
-      return state.processes;
-    },
-
-    getAverageWaitingTime() {
-      const sum = state.doneProcesses.reduce(
-        (acc, process) => acc + process.waitingTime,
-        0
+    getProcesses: () => {
+      return state.processes.filter(
+        (p) => !p.isFinished && state.currentProcess?.pid !== p.pid
       );
-
-      return sum / state.doneProcesses.length;
     },
-
-    consumeProcess: () => {
-      if (!state.currentProcess || state.currentProcess.isDone()) {
-        const process = state.processes.shift() ?? null;
-
-        state.currentProcess = process;
-      }
-
-      cpu.setCurrentProcess(state.currentProcess);
-    },
-
-    startQueue: () => {
-      state.isRunning = true;
-
-      state.interval = setInterval(() => {
-        state.processes.forEach((process) => {
-          process.waitingTime += 1;
-        });
-      }, 1000);
-
-      cpu.start((process) => {
-        state.doneProcesses.push(process);
-        state.consumeProcess();
-        console.log("proces zakończony");
-      });
-
-      const subscription = subscribe(state.processes, () => {
-        if (state.processes.length > 0 && state.currentProcess === null) {
-          state.consumeProcess();
+    increaseWaitingTime: () => {
+      state.processes.forEach((p) => {
+        if (!p.isFinished && p.pid !== state.currentProcess?.pid) {
+          p.increaseWaitingTime(waiter.tickValue);
         }
       });
-
-      state.subscriptions.push(subscription);
-
-      state.consumeProcess();
-
-      return state.doneProcesses;
     },
+    allProcessesDone: () => {
+      return state.processes.every((p) => p.isFinished);
+    },
+    finishProcess: (process: Process) => {
+      state.processes = state.processes.filter((p) => p.pid !== process.pid);
 
-    stopQueue: () => {
-      state.isRunning = false;
-
-      if (state.interval) {
-        clearInterval(state.interval);
+      if (state.currentProcess?.pid === process.pid) {
+        state.currentProcess = null;
       }
 
-      state.subscriptions.forEach((unsubscribe) => unsubscribe());
-      cpu.stop();
+      state.doneProcesses.push(process);
+    },
+    clearProcesses: () => {
+      state.processes = [];
+    },
+    getAverageWaitingTime: () => {
+      if (state.doneProcesses.length === 0) {
+        return 0;
+      }
+
+      const totalWaitingTime = state.doneProcesses.reduce(
+        (acc, p) => acc + p.waitingTime,
+        0
+      );
+      return totalWaitingTime / state.doneProcesses.length / 1000;
+    },
+    startQueue: async () => {
+      state.isRunning = true;
+      while (!state.allProcessesDone()) {
+        if (state.currentProcess === null) {
+          const process = state.getProcesses()[0];
+          if (process) {
+            state.setCurrentProcess(process);
+          }
+        }
+        if (state.currentProcess) {
+          await state.cpu.consumeProcess({ process: state.currentProcess });
+          if (state.currentProcess && state.currentProcess.isFinished) {
+            state.finishProcess(state.currentProcess);
+            state.clearCurrentProcess();
+          }
+        }
+
+        state.increaseWaitingTime();
+      }
+      state.clearCurrentProcess();
+      state.stopQueue();
+    },
+    stopQueue: () => {
+      state.isRunning = false;
     },
   });
 

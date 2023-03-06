@@ -7,6 +7,7 @@ import { Process } from "@/components/Process";
 import { createProcess } from "@/lib/Process";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { QueueList } from "@/components/QueueList";
+import { WaiterController } from "@/components/WaiterController";
 import { useSJF } from "@/hooks/useSJF";
 import { useSJFWithW } from "@/hooks/useSJFWithW";
 import { useRoundRobin } from "@/hooks/useRoundRobin";
@@ -17,11 +18,11 @@ const lato = Lato({
 
 export default function Home() {
   const { queue } = useQueue();
-  const { SJF } = useSJF();
-  const { SJFWithW } = useSJFWithW();
-  const { RoundRobin } = useRoundRobin();
+  const { sjf } = useSJF();
+  const { sjfWithW } = useSJFWithW();
+  const { roundRobin } = useRoundRobin();
 
-  const allQueues = [queue, SJF, SJFWithW, RoundRobin];
+  const allQueues = [queue, sjf, sjfWithW, roundRobin];
 
   return (
     <>
@@ -33,12 +34,13 @@ export default function Home() {
       </Head>
       <Container maxW="container.xl" className={lato.className}>
         <HStack mt={6} mb={6} justify="center">
+          <WaiterController />
           <Button
             mr={2}
             onClick={() => {
               const length = Math.floor(Math.random() * 10) + 1;
               allQueues.forEach((queue) => {
-                const process = createProcess({ length: 5 });
+                const process = createProcess({ length: length * 1000 });
                 queue.addProcess(process);
               });
             }}
@@ -50,7 +52,7 @@ export default function Home() {
             onClick={() => {
               const length = Math.floor(Math.random() * 2) + 1;
               allQueues.forEach((queue) => {
-                const process = createProcess({ length });
+                const process = createProcess({ length: length * 1000 });
                 queue.addProcess(process);
               });
             }}
@@ -62,7 +64,7 @@ export default function Home() {
             onClick={() => {
               const length = Math.floor(Math.random() * 2) + 6;
               allQueues.forEach((queue) => {
-                const process = createProcess({ length });
+                const process = createProcess({ length: length * 1000 });
                 queue.addProcess(process);
               });
             }}
@@ -90,12 +92,21 @@ export default function Home() {
               Wystartuj kolejke
             </Button>
           )}
+          <Button
+            onClick={() => {
+              allQueues.forEach((queue) => {
+                queue.clearProcesses();
+              });
+            }}
+          >
+            Wyczyść kolejke
+          </Button>
         </HStack>
         <HStack spacing={16} alignItems="flex-start">
           <QueueList queue={queue} name="FCFS" />
-          <QueueList queue={SJF} name="SJF" />
-          <QueueList queue={SJFWithW} name="SJF (z wywłaszczeniem)" />
-          <QueueList queue={RoundRobin} name="RoundRobin" />
+          <QueueList queue={sjf} name="SJF" />
+          <QueueList queue={sjfWithW} name="SJF (z wywłaszczaniem)" />
+          <QueueList queue={roundRobin} name="Round Robin" />
         </HStack>
       </Container>
     </>

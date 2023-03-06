@@ -6,12 +6,8 @@ import { Process as ProcessType } from "@/lib/Process";
 const getColor = chroma.scale(["red", "yellow", "green"]).domain([0, 100]);
 
 export const Process = ({ process }: { process: ProcessType }) => {
-  const height = 100 - (process.length / process.initialLength) * 100;
-  const [color, setColor] = useState(() => getColor(height).hex());
-
-  useEffect(() => {
-    setColor(getColor(height).hex());
-  }, [height]);
+  const height = 100 - (process.remaining / process.length) * 100;
+  const color = getColor(height).hex();
 
   return (
     <VStack
@@ -25,7 +21,7 @@ export const Process = ({ process }: { process: ProcessType }) => {
       <Box>
         <Text fontWeight="semibold">Proces</Text>
         <Text pl={2} fontSize="sm">
-          Długość procesu: {Math.round(process.length)}
+          Długość procesu: {Math.round(process.length / 1000)}
         </Text>
         <Text>{process.pid}</Text>
       </Box>

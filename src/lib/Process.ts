@@ -1,18 +1,23 @@
-import { proxy } from "valtio";
+import { proxy, subscribe } from "valtio";
 
 export const createProcess = ({ length }: { length: number }) => {
   const state = proxy({
-    pid: Math.random().toString(36).slice(2),
+    pid: Math.random().toString(36).slice(0, 6),
     length,
-    initialLength: length,
-    registrationTime: new Date(),
-    lastIncrease: 0,
+    remaining: length,
     waitingTime: 0,
-    isDone() {
-      return state.length <= 0;
+    isRunning: false,
+    isFinished: false,
+    decreaseRemaining: (amount: number) => {
+      if (!state.isFinished) {
+        state.remaining -= amount;
+      }
+      if (state.remaining <= 0) {
+        state.isFinished = true;
+      }
     },
-    increaseWaitingTime(increase: number) {
-      state.lastIncrease += increase;
+    increaseWaitingTime: (amount: number) => {
+      state.waitingTime += amount;
     },
   });
 

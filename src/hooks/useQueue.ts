@@ -2,8 +2,8 @@ import { useSnapshot } from "valtio";
 import { createCPU } from "@/lib/CPU";
 import { createQueue } from "@/lib/Queue";
 
-const cpuProxy = createCPU({ speed: 1 });
-const queueProxy = createQueue({ cpu: cpuProxy });
+const cpuProxy = createCPU();
+const queueProxy = createQueue(cpuProxy);
 
 export const useQueue = () => {
   const cpu = useSnapshot(cpuProxy);
