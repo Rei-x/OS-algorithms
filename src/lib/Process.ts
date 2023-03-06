@@ -6,9 +6,13 @@ export const createProcess = ({ length }: { length: number }) => {
     length,
     initialLength: length,
     registrationTime: new Date(),
+    lastIncrease: 0,
     waitingTime: 0,
     isDone() {
       return state.length <= 0;
+    },
+    increaseWaitingTime(increase: number) {
+      state.lastIncrease += increase;
     },
   });
 

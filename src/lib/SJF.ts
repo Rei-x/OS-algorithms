@@ -10,7 +10,7 @@ export const createSJFNonW = ({ cpu }: { cpu: CPU }): Queue => {
     isRunning: false,
     currentProcess: null as Process | null,
     interval: null as NodeJS.Timer | null,
-    subscription: null as (() => void) | null,
+    subscriptions: [] as (() => void)[],
     cpu,
     addProcess(process: Process) {
       state.processes.push(process);
@@ -45,20 +45,22 @@ export const createSJFNonW = ({ cpu }: { cpu: CPU }): Queue => {
 
       state.interval = setInterval(() => {
         state.processes.forEach((process) => {
-          process.waitingTime += 1;
+          process.waitingTime += 0.2;
         });
-      }, 1000);
+      }, 200);
 
       cpu.start((process) => {
         state.doneProcesses.push(process);
         state.consumeProcess();
       });
 
-      state.subscription = subscribe(state.processes, () => {
+      const subscription = subscribe(state.processes, () => {
         if (state.processes.length > 0 && state.currentProcess === null) {
           state.consumeProcess();
         }
       });
+
+      state.subscriptions.push(subscription);
 
       state.consumeProcess();
 
@@ -71,7 +73,9 @@ export const createSJFNonW = ({ cpu }: { cpu: CPU }): Queue => {
       if (state.interval) {
         clearInterval(state.interval);
       }
-      state.subscription?.();
+
+      state.subscriptions.forEach((unsubscribe) => unsubscribe());
+
       cpu.stop();
     },
   });

@@ -6,7 +6,7 @@ const cpuProxy = createCPU({ speed: 1 });
 const queueProxy = createSJFNonW({ cpu: cpuProxy });
 
 export const useSJF = () => {
-  const sjf = useSnapshot(queueProxy);
+  const SJF = useSnapshot(queueProxy);
 
-  return { sjf };
+  return { SJF };
 };

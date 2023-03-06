@@ -40,13 +40,20 @@ export const createCPU = ({ speed }: { speed: number }) => {
         (process) => {
           if (isDifferentProcess(lastProcess, process)) {
             state.stopCurrentProcess();
+          } else {
+            return;
           }
+
+          lastProcess = process;
 
           if (process === null) {
             return;
           }
 
-          const intervalSpeed = 200;
+          const intervalSpeed = 100;
+
+          process.waitingTime += process.lastIncrease;
+          process.lastIncrease = 0;
 
           state.currentInterval = setInterval(() => {
             if (process.isDone()) {

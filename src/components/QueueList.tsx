@@ -1,5 +1,5 @@
 import { Queue } from "@/lib/Queue";
-import { VStack, List, Text, Box } from "@chakra-ui/react";
+import { VStack, List, Text, Box, Tag } from "@chakra-ui/react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import React from "react";
 import { useSnapshot } from "valtio";
@@ -16,8 +16,10 @@ export const QueueList = ({
 
   return (
     <VStack w="15rem">
-      <Text>{name}</Text>
-      <Text>
+      <Tag colorScheme="purple" size="lg" fontWeight="bold">
+        {name}
+      </Tag>
+      <Text color="gray">
         Średni czas oczekiwania:{" "}
         {Math.round(queue.getAverageWaitingTime() * 10) / 10}s
       </Text>

@@ -27,6 +27,7 @@ export const Process = ({ process }: { process: ProcessType }) => {
         <Text pl={2} fontSize="sm">
           Długość procesu: {Math.round(process.length)}
         </Text>
+        <Text>{process.pid}</Text>
       </Box>
       <Box
         w="100%"
