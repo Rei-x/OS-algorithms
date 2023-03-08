@@ -45,6 +45,9 @@ export const createQueue = (cpu: CPU) => {
     },
     clearProcesses: () => {
       state.processes = [];
+      state.doneProcesses = [];
+      state.clearCurrentProcess();
+      state.stopQueue();
     },
     getAverageWaitingTime: () => {
       if (state.doneProcesses.length === 0) {
@@ -59,9 +62,9 @@ export const createQueue = (cpu: CPU) => {
     },
     startQueue: async () => {
       state.isRunning = true;
-      while (!state.allProcessesDone()) {
+      while (!state.allProcessesDone() && state.isRunning) {
         if (state.currentProcess === null) {
-          const process = state.getProcesses()[0];
+          const process = state.getProcesses().at(0);
           if (process) {
             state.setCurrentProcess(process);
           }
@@ -80,6 +83,9 @@ export const createQueue = (cpu: CPU) => {
       state.stopQueue();
     },
     stopQueue: () => {
+      console.log("Queue done");
+      console.log("Average waiting time: ", state.getAverageWaitingTime());
+      console.log("Done processes: ", state.doneProcesses);
       state.isRunning = false;
     },
   });

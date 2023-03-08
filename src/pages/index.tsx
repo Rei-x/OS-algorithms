@@ -1,20 +1,44 @@
 import Head from "next/head";
-import { Inter, Lato } from "next/font/google";
 import { useQueue } from "../hooks/useQueue";
-import { Container, HStack, List, Text, VStack } from "@chakra-ui/layout";
-import { Button } from "@chakra-ui/button";
-import { Process } from "@/components/Process";
+import { Center, Container, Divider, HStack, Text } from "@chakra-ui/layout";
+import { Button, ButtonProps } from "@chakra-ui/button";
 import { createProcess } from "@/lib/Process";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { QueueList } from "@/components/QueueList";
 import { WaiterController } from "@/components/WaiterController";
 import { useSJF } from "@/hooks/useSJF";
 import { useSJFWithW } from "@/hooks/useSJFWithW";
 import { useRoundRobin } from "@/hooks/useRoundRobin";
+import { VStack, Heading, List, ListItem, Box } from "@chakra-ui/react";
+import { Lato } from "next/font/google";
+import { Settings } from "@/components/Settings";
+import {
+  ChevronRightIcon,
+  CloseIcon,
+  DeleteIcon,
+  NotAllowedIcon,
+  SmallAddIcon,
+} from "@chakra-ui/icons";
+
 const lato = Lato({
   weight: ["400", "700"],
   subsets: ["latin-ext"],
 });
+
+const ButtonIcon = ({
+  children,
+  icon,
+  ...props
+}: {
+  children: React.ReactNode;
+  icon: React.ReactNode;
+} & ButtonProps) => (
+  <Button w="200px" justifyContent="start" {...props}>
+    <HStack justify="start">
+      <Center w="20px">{icon}</Center>
+      <Text>{children}</Text>
+    </HStack>
+  </Button>
+);
 
 export default function Home() {
   const { queue } = useQueue();
@@ -32,83 +56,122 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container maxW="container.xl" className={lato.className}>
-        <HStack mt={6} mb={6} justify="center">
-          <WaiterController />
-          <Button
-            mr={2}
-            onClick={() => {
-              const length = Math.floor(Math.random() * 10) + 1;
-              allQueues.forEach((queue) => {
-                const process = createProcess({ length: length * 1000 });
-                queue.addProcess(process);
-              });
-            }}
-          >
-            Dodaj proces
-          </Button>
-          <Button
-            mr={2}
-            onClick={() => {
-              const length = Math.floor(Math.random() * 2) + 1;
-              allQueues.forEach((queue) => {
-                const process = createProcess({ length: length * 1000 });
-                queue.addProcess(process);
-              });
-            }}
-          >
-            Dodaj krótki proces
-          </Button>
-          <Button
-            mr={2}
-            onClick={() => {
-              const length = Math.floor(Math.random() * 2) + 6;
-              allQueues.forEach((queue) => {
-                const process = createProcess({ length: length * 1000 });
-                queue.addProcess(process);
-              });
-            }}
-          >
-            Dodaj długi proces
-          </Button>
-          {queue.isRunning ? (
-            <Button
+      <HStack align="start" className={lato.className}>
+        <VStack
+          align="start"
+          justify="space-between"
+          p="4"
+          px="8"
+          h="100%"
+          minH="100vh"
+          borderColor="gray.200"
+          borderRightWidth="2px"
+          borderStyle="solid"
+        >
+          <VStack w="20rem" align="start" justify="start">
+            <Heading size="lg">Dostęp do procesora</Heading>
+            <Heading textAlign="left" pt="10" size="md">
+              Scenariusze
+            </Heading>
+            <List spacing="2">
+              <ListItem>Pusty</ListItem>
+              <ListItem>Krótkie procesy</ListItem>
+              <ListItem>Długie procesy</ListItem>
+              <ListItem>Mieszane procesy</ListItem>
+              <ListItem>
+                Długie procesy, z dołączeniem krótkich później
+              </ListItem>
+            </List>
+          </VStack>
+          <VStack align="start">
+            <Heading textAlign="left" pt="10" mb="2" size="md">
+              Panel kontrolny
+            </Heading>
+            <ButtonIcon
+              icon={<SmallAddIcon boxSize={4} />}
               onClick={() => {
+                const length = Math.floor(Math.random() * 2) + 1;
                 allQueues.forEach((queue) => {
-                  queue.stopQueue();
+                  const process = createProcess({ length: length * 1000 });
+                  queue.addProcess(process);
                 });
               }}
             >
-              Zatrzymaj kolejke
-            </Button>
-          ) : (
-            <Button
+              Dodaj krótki proces
+            </ButtonIcon>
+            <ButtonIcon
+              icon={<SmallAddIcon boxSize={6} />}
               onClick={() => {
+                const length = Math.floor(Math.random() * 10) + 1;
                 allQueues.forEach((queue) => {
-                  queue.startQueue();
+                  const process = createProcess({ length: length * 1000 });
+                  queue.addProcess(process);
                 });
               }}
             >
-              Wystartuj kolejke
-            </Button>
-          )}
-          <Button
-            onClick={() => {
-              allQueues.forEach((queue) => {
-                queue.clearProcesses();
-              });
-            }}
-          >
-            Wyczyść kolejke
-          </Button>
-        </HStack>
-        <HStack spacing={16} alignItems="flex-start">
-          <QueueList queue={queue} name="FCFS" />
-          <QueueList queue={sjf} name="SJF" />
-          <QueueList queue={sjfWithW} name="SJF (z wywłaszczaniem)" />
-          <QueueList queue={roundRobin} name="Round Robin" />
-        </HStack>
-      </Container>
+              Dodaj proces
+            </ButtonIcon>
+
+            <ButtonIcon
+              icon={<SmallAddIcon boxSize={8} />}
+              onClick={() => {
+                const length = Math.floor(Math.random() * 2) + 6;
+                allQueues.forEach((queue) => {
+                  const process = createProcess({ length: length * 1000 });
+                  queue.addProcess(process);
+                });
+              }}
+            >
+              Dodaj długi proces
+            </ButtonIcon>
+            {queue.isRunning ? (
+              <ButtonIcon
+                icon={<CloseIcon boxSize="4" />}
+                onClick={() => {
+                  allQueues.forEach((queue) => {
+                    queue.stopQueue();
+                  });
+                }}
+              >
+                Zatrzymaj kolejke
+              </ButtonIcon>
+            ) : (
+              <ButtonIcon
+                icon={<ChevronRightIcon boxSize="4" />}
+                onClick={() => {
+                  allQueues.forEach((queue) => {
+                    queue.startQueue();
+                  });
+                }}
+              >
+                Wystartuj kolejke
+              </ButtonIcon>
+            )}
+            <ButtonIcon
+              icon={<DeleteIcon />}
+              onClick={() => {
+                allQueues.forEach((queue) => {
+                  queue.clearProcesses();
+                });
+              }}
+            >
+              Restart
+            </ButtonIcon>
+            <Divider pt="2" />
+            <Settings />
+          </VStack>
+        </VStack>
+        <VStack w="100%">
+          <Container mt="16" ml="auto" maxW="container.xl">
+            <HStack spacing={16} align="start">
+              <QueueList queue={queue} name="FCFS" />
+              <QueueList queue={sjf} name="SJF" />
+              <QueueList queue={sjfWithW} name="SJF (z wywłaszczaniem)" />
+              <QueueList queue={roundRobin} name="Round Robin" />
+            </HStack>
+          </Container>
+        </VStack>
+      </HStack>
     </>
   );
 }

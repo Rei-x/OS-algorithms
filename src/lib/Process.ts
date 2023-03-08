@@ -6,7 +6,6 @@ export const createProcess = ({ length }: { length: number }) => {
     length,
     remaining: length,
     waitingTime: 0,
-    isRunning: false,
     isFinished: false,
     decreaseRemaining: (amount: number) => {
       if (!state.isFinished) {
