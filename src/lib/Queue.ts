@@ -1,7 +1,6 @@
 import { proxy } from "valtio";
 import { CPU } from "./CPU";
 import { Process } from "./Process";
-import { waiter } from "./waiter";
 
 export const createQueue = (cpu: CPU) => {
   const state = proxy({

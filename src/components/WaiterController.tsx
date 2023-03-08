@@ -7,10 +7,6 @@ import {
   FormHelperText,
   FormLabel,
   Heading,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInputField,
-  NumberInputStepper,
   Switch,
   VStack,
 } from "@chakra-ui/react";
@@ -26,7 +22,7 @@ export const WaiterController = () => {
         <Heading pt="4" pb="2" alignSelf="start" size="sm">
           Ogólne
         </Heading>
-        <FormControl isDisabled={!waiter.shouldWait}>
+        <FormControl isDisabled={!snap.shouldWait}>
           <FormLabel>
             Długość okna czasu
             <NumberInput
@@ -34,7 +30,7 @@ export const WaiterController = () => {
               step={50}
               value={snap.tickValue}
               min={100}
-              onChange={(_, number) => (waiter.tickValue = number)}
+              onChange={(_, number) => snap.setTickValue(number)}
             />
           </FormLabel>
           <FormHelperText>Jak często kolejka się odświeża</FormHelperText>
@@ -43,7 +39,7 @@ export const WaiterController = () => {
           <FormLabel>Animacja</FormLabel>
           <Switch
             isChecked={snap.shouldWait}
-            onChange={() => (waiter.shouldWait = !snap.shouldWait)}
+            onChange={() => snap.setShouldWait(!snap.shouldWait)}
           />
           <FormHelperText>
             Animacja dodawania procesów i ich przetwarzania
