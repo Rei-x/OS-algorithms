@@ -31,12 +31,17 @@ export const createProcess = ({
     waitingTime: 0,
     isFinished: false,
     decreaseRemaining: (amount: number) => {
+      let oldRemaining = state.remaining;
+
       if (!state.isFinished) {
         state.remaining -= amount;
       }
       if (state.remaining <= 0) {
         state.isFinished = true;
+        state.remaining = 0;
       }
+
+      return oldRemaining - state.remaining;
     },
     increaseWaitingTime: (amount: number) => {
       state.waitingTime += amount;

@@ -4,8 +4,10 @@ import { waiter } from "./waiter";
 export const createCPU = () => {
   const state = proxy({
     consumeProcess: async ({ process }: { process: Process }) => {
-      await waiter.wait();
-      process.decreaseRemaining(waiter.tickValue);
+      const timePassed = process.decreaseRemaining(waiter.tickValue);
+      await waiter.wait(timePassed);
+
+      return timePassed;
     },
   });
 

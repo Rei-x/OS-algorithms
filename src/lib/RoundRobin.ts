@@ -22,35 +22,10 @@ export const createRoundRobin = (cpu: CPU) => {
 
   let currentTick = 0;
 
-  state.startQueue = async () => {
-    state.isRunning = true;
-    while (!state.allProcessesDone() && state.isRunning) {
-      if (state.currentProcess === null) {
-        const process = state.getProcesses()[0];
-
-        if (process) {
-          state.setCurrentProcess(process);
-        }
-      }
-
-      if (state.currentProcess) {
-        await state.cpu.consumeProcess({ process: state.currentProcess });
-
-        if (state.currentProcess && state.currentProcess.isFinished) {
-          state.finishProcess(state.currentProcess);
-          state.clearCurrentProcess();
-        }
-      }
-
-      state.increaseWaitingTime();
-
-      currentTick++;
-      if (currentTick % roundRobinSettings.jumpEveryXTicks === 0) nextArray();
-    }
-    state.clearCurrentProcess();
-    state.stopQueue();
+  state.afterProcessProcessed = () => {
+    currentTick++;
+    if (currentTick % roundRobinSettings.jumpEveryXTicks === 0) nextArray();
   };
-
   return state;
 };
 

@@ -24,10 +24,10 @@ export const createQueue = (cpu: CPU) => {
         (p) => !p.isFinished && state.currentProcess?.pid !== p.pid
       );
     },
-    increaseWaitingTime: () => {
+    increaseWaitingTime: (time: number) => {
       state.processes.forEach((p) => {
         if (!p.isFinished && p.pid !== state.currentProcess?.pid) {
-          p.increaseWaitingTime(waiter.tickValue);
+          p.increaseWaitingTime(time);
         }
       });
     },
@@ -69,19 +69,27 @@ export const createQueue = (cpu: CPU) => {
             state.setCurrentProcess(process);
           }
         }
+
+        let timePassed = 0;
+
         if (state.currentProcess) {
-          await state.cpu.consumeProcess({ process: state.currentProcess });
+          timePassed = await state.cpu.consumeProcess({
+            process: state.currentProcess,
+          });
           if (state.currentProcess && state.currentProcess.isFinished) {
             state.finishProcess(state.currentProcess);
             state.clearCurrentProcess();
           }
         }
 
-        state.increaseWaitingTime();
+        state.increaseWaitingTime(timePassed);
+
+        state.afterProcessProcessed();
       }
       state.clearCurrentProcess();
       state.stopQueue();
     },
+    afterProcessProcessed: () => {},
     stopQueue: () => {
       console.log("Queue done");
       console.log("Average waiting time: ", state.getAverageWaitingTime());
