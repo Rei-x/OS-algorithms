@@ -70,7 +70,7 @@ export default function Home() {
         >
           <VStack w="20rem" align="start" justify="start">
             <Heading size="lg">Dostęp do procesora</Heading>
-            <Heading textAlign="left" pt="10" size="md">
+            {/* <Heading textAlign="left" pt="10" size="md">
               Scenariusze
             </Heading>
             <List spacing="2">
@@ -81,7 +81,7 @@ export default function Home() {
               <ListItem>
                 Długie procesy, z dołączeniem krótkich później
               </ListItem>
-            </List>
+            </List> */}
           </VStack>
           <VStack align="start">
             <Heading textAlign="left" pt="10" mb="2" size="md">
