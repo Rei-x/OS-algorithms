@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useQueue } from "../hooks/useQueue";
 import { Center, Container, Divider, HStack, Text } from "@chakra-ui/layout";
 import { Button, ButtonProps } from "@chakra-ui/button";
-import { createProcess } from "@/lib/Process";
+import { createProcess, generatePid } from "@/lib/Process";
 import { QueueList } from "@/components/QueueList";
 import { WaiterController } from "@/components/WaiterController";
 import { useSJF } from "@/hooks/useSJF";
@@ -18,6 +18,7 @@ import {
   NotAllowedIcon,
   SmallAddIcon,
 } from "@chakra-ui/icons";
+import { useProcessSettings } from "@/hooks/useProcessSettings";
 
 const lato = Lato({
   weight: ["400", "700"],
@@ -45,8 +46,29 @@ export default function Home() {
   const { sjf } = useSJF();
   const { sjfWithW } = useSJFWithW();
   const { roundRobin } = useRoundRobin();
+  const processSettings = useProcessSettings();
 
   const allQueues = [queue, sjf, sjfWithW, roundRobin];
+
+  const addProcess = (length: "short" | "medium" | "long") => {
+    const settings = {
+      short: processSettings.shortProcess,
+      medium: processSettings.mediumProcess,
+      long: processSettings.longProcess,
+    } as const;
+
+    const processLength = settings[length];
+
+    allQueues.forEach((queue) => {
+      const pid = generatePid();
+      const process = createProcess({
+        pid,
+        length: processLength,
+      });
+
+      queue.addProcess(process);
+    });
+  };
 
   return (
     <>
@@ -90,11 +112,7 @@ export default function Home() {
             <ButtonIcon
               icon={<SmallAddIcon boxSize={4} />}
               onClick={() => {
-                const length = Math.floor(Math.random() * 2) + 1;
-                allQueues.forEach((queue) => {
-                  const process = createProcess({ length: length * 1000 });
-                  queue.addProcess(process);
-                });
+                addProcess("short");
               }}
             >
               Dodaj krótki proces
@@ -102,11 +120,7 @@ export default function Home() {
             <ButtonIcon
               icon={<SmallAddIcon boxSize={6} />}
               onClick={() => {
-                const length = Math.floor(Math.random() * 10) + 1;
-                allQueues.forEach((queue) => {
-                  const process = createProcess({ length: length * 1000 });
-                  queue.addProcess(process);
-                });
+                addProcess("medium");
               }}
             >
               Dodaj proces
@@ -115,17 +129,14 @@ export default function Home() {
             <ButtonIcon
               icon={<SmallAddIcon boxSize={8} />}
               onClick={() => {
-                const length = Math.floor(Math.random() * 2) + 6;
-                allQueues.forEach((queue) => {
-                  const process = createProcess({ length: length * 1000 });
-                  queue.addProcess(process);
-                });
+                addProcess("long");
               }}
             >
               Dodaj długi proces
             </ButtonIcon>
             {queue.isRunning ? (
               <ButtonIcon
+                colorScheme="red"
                 icon={<CloseIcon boxSize="4" />}
                 onClick={() => {
                   allQueues.forEach((queue) => {

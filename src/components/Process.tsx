@@ -1,7 +1,8 @@
-import { Box, Text, VStack } from "@chakra-ui/layout";
+import { Box, Flex, Text, VStack } from "@chakra-ui/layout";
 import React, { useEffect, useState } from "react";
 import chroma from "chroma-js";
 import { Process as ProcessType } from "@/lib/Process";
+import { Tag } from "@chakra-ui/react";
 
 const getColor = chroma.scale(["red", "yellow", "green"]).domain([0, 100]);
 
@@ -11,23 +12,36 @@ export const Process = ({ process }: { process: ProcessType }) => {
 
   return (
     <VStack
-      w="6rem"
-      h="6rem"
+      w="7rem"
+      h="7rem"
       bg="blackAlpha.50"
       position="relative"
       borderRadius="md"
       overflow="hidden"
     >
-      <Box>
-        <Text fontWeight="semibold">Proces</Text>
-        <Text pl={2} fontSize="sm">
-          Długość procesu: {Math.round(process.length / 1000)}
-        </Text>
-        <Text>{process.pid}</Text>
-      </Box>
+      <Flex
+        flexDir="column"
+        justify="space-between"
+        align="center"
+        textAlign="center"
+        p="2"
+        h="100%"
+      >
+        <Box>
+          <Text fontWeight="semibold">Proces</Text>
+          <Tag mt="2" colorScheme="blackAlpha">
+            {process.pid}
+          </Tag>
+        </Box>
+        <Box>
+          <Text pl={2} fontSize="sm">
+            {Math.round(process.length / 1000)}s
+          </Text>
+        </Box>
+      </Flex>
       <Box
         w="100%"
-        h="6rem"
+        h="7rem"
         bg={color}
         position="absolute"
         bottom="0"

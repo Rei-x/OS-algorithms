@@ -9,13 +9,13 @@ import {
   Heading,
   NumberDecrementStepper,
   NumberIncrementStepper,
-  NumberInput,
   NumberInputField,
   NumberInputStepper,
   Switch,
   VStack,
 } from "@chakra-ui/react";
 import { useRoundRobinSettings } from "@/hooks/useRoundRobin";
+import { NumberInput } from "./NumberInput";
 
 export const WaiterController = () => {
   const snap = useSnapshot(waiter);
@@ -35,13 +35,7 @@ export const WaiterController = () => {
               value={snap.tickValue}
               min={100}
               onChange={(_, number) => (waiter.tickValue = number)}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            />
           </FormLabel>
           <FormHelperText>Jak często kolejka się odświeża</FormHelperText>
         </FormControl>
@@ -69,13 +63,7 @@ export const WaiterController = () => {
               onChange={(_, number) =>
                 timeQuantom.setJumpEveryXTicks(number / snap.tickValue)
               }
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            />
           </FormLabel>
           <FormHelperText>
             Co jaki czas ma nastąpić przełączenie procesu
