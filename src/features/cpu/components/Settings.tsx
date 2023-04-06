@@ -1,4 +1,4 @@
-import { useProcessSettings } from "@/hooks/useProcessSettings";
+import { useProcessSettings } from "../hooks/useProcessSettings";
 import {
   Box,
   Button,
@@ -14,8 +14,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React from "react";
-import { NumberInput } from "./NumberInput";
-import { Slider } from "./Slider";
+import { NumberInput } from "@/components/NumberInput";
+import { Slider } from "@/components/Slider";
 import { WaiterController } from "./WaiterController";
 
 export const Settings = () => {

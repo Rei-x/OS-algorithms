@@ -1,5 +1,5 @@
 import React from "react";
-import { waiter } from "@/lib/waiter";
+import { waiter } from "../lib/waiter";
 import { useSnapshot } from "valtio";
 import {
   Box,
@@ -10,8 +10,8 @@ import {
   Switch,
   VStack,
 } from "@chakra-ui/react";
-import { useRoundRobinSettings } from "@/hooks/useRoundRobin";
-import { NumberInput } from "./NumberInput";
+import { useRoundRobinSettings } from "../hooks/useRoundRobin";
+import { NumberInput } from "@/components/NumberInput";
 
 export const WaiterController = () => {
   const snap = useSnapshot(waiter);

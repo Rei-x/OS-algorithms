@@ -1,6 +1,6 @@
 import { useSnapshot } from "valtio";
-import { createCPU } from "@/lib/CPU";
-import { createQueue } from "@/lib/Queue";
+import { createCPU } from "../lib/CPU";
+import { createQueue } from "../lib/Queue";
 
 const cpuProxy = createCPU();
 const queueProxy = createQueue(cpuProxy);

@@ -1,6 +1,5 @@
-import { Queue } from "@/lib/Queue";
-import { VStack, List, Text, Box, Tag } from "@chakra-ui/react";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { Queue } from "../lib/Queue";
+import { VStack, Text, Box, Tag } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useSnapshot } from "valtio";

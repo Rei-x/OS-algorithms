@@ -1,6 +1,6 @@
 import { useSnapshot } from "valtio";
-import { createCPU } from "@/lib/CPU";
-import { createRoundRobin, roundRobinSettings } from "@/lib/RoundRobin";
+import { createCPU } from "../lib/CPU";
+import { createRoundRobin, roundRobinSettings } from "../lib/RoundRobin";
 
 const cpuProxy = createCPU();
 const queueProxy = createRoundRobin(cpuProxy);

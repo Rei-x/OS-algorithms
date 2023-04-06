@@ -1,7 +1,7 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/layout";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import chroma from "chroma-js";
-import { Process as ProcessType } from "@/lib/Process";
+import { Process as ProcessType } from "../lib/Process";
 import { Tag } from "@chakra-ui/react";
 
 const getColor = chroma.scale(["red", "yellow", "green"]).domain([0, 100]);
