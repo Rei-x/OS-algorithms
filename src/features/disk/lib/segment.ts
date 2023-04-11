@@ -1,16 +1,16 @@
 import { proxy } from "valtio";
 
-export const createSegment = () => {
+export const createSegment = ({ numberOnDisk }: { numberOnDisk: number }) => {
   const state = proxy({
     isDone: false,
-    isCurrent: false,
-    numberOnDisk: 0,
+    isQueued: false,
+    numberOnDisk,
     priority: 0,
     setIsDone: (isDone: boolean) => {
       state.isDone = isDone;
     },
-    setIsCurrent: (isCurrent: boolean) => {
-      state.isCurrent = isCurrent;
+    setIsQueued: (isQueued: boolean) => {
+      state.isQueued = isQueued;
     },
   });
 

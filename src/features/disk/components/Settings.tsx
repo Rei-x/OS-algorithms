@@ -25,6 +25,9 @@ import {
   DeleteIcon,
 } from "@chakra-ui/icons";
 
+export const width = "1000px";
+export const numberOfSegments = 100;
+
 export const Settings = () => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const format = (val: number) => `${val}s`;
@@ -32,7 +35,7 @@ export const Settings = () => {
 
   return (
     <>
-      <VStack align="end" justify="end" h="100vh">
+      <VStack align="end" justify="end" mt="auto">
         <Heading textAlign="left" pt="10" mb="2" size="md">
           Panel kontrolny
         </Heading>
