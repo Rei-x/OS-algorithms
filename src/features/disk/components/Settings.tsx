@@ -28,7 +28,7 @@ import {
 export const width = "1000px";
 export const numberOfSegments = 100;
 
-export const Settings = () => {
+export const Settings = ({ }) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const format = (val: number) => `${val}s`;
   const parse = (val: string) => parseInt(val.replaceAll("s", "")) ?? 1;
@@ -39,14 +39,12 @@ export const Settings = () => {
         <Heading textAlign="left" pt="10" mb="2" size="md">
           Panel kontrolny
         </Heading>
-        <ButtonIcon icon={<SmallAddIcon boxSize={4} />}>
-          Dodaj krótki proces
-        </ButtonIcon>
+        <ButtonIcon icon={<SmallAddIcon boxSize={4} />}>Dużo żądań</ButtonIcon>
         <ButtonIcon icon={<SmallAddIcon boxSize={6} />}>
-          Dodaj proces
+          Jedno żądanie na raz
         </ButtonIcon>
         <ButtonIcon icon={<SmallAddIcon boxSize={8} />}>
-          Dodaj długi proces
+          Głodzenie procesów
         </ButtonIcon>
         <ButtonIcon colorScheme="red" icon={<CloseIcon boxSize="4" />}>
           Zatrzymaj kolejke

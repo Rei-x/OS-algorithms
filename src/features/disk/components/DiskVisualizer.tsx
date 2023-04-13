@@ -12,6 +12,8 @@ export const DiskVisualizer = ({
   queue: {
     next: () => void;
     queue: readonly number[];
+    addToQueue: (number: number) => void;
+    removeFromQueue: (number: number) => void;
   };
   disk: Disk;
 }) => {
@@ -50,17 +52,26 @@ export const DiskVisualizer = ({
       <Box pt="40px" gap={"1px"} display="flex">
         {disk.segments.map((segment, i) => (
           <Box
-            key={i}
+            key={segment.numberOnDisk}
             w="10px"
             fontSize="7px"
             h="10px"
             bgColor={
               segment.isDone ? "green" : segment.isQueued ? "red" : "gray.200"
             }
-            transition="all 0.1s ease-in-out"
-          >
-            {queue.queue.indexOf(i) !== -1 ? queue.queue.indexOf(i) : ""}
-          </Box>
+            _hover={{
+              bgColor: segment.isQueued ? "red.200" : "gray.300",
+            }}
+            cursor="pointer"
+            transition="all 0.3s ease-in-out"
+            onClick={() => {
+              if (segment.isQueued) {
+                queue.removeFromQueue(segment.numberOnDisk);
+              } else {
+                queue.addToQueue(segment.numberOnDisk);
+              }
+            }}
+          />
         ))}
       </Box>
     </Box>

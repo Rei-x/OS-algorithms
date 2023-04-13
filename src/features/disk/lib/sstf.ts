@@ -1,4 +1,3 @@
-import { proxy } from "valtio";
 import { Disk } from "../hooks/useDisk";
 import { createFCFS } from "./fcfs";
 
@@ -6,6 +5,16 @@ export const createSSTF = ({ disk }: { disk: Disk }) => {
   const state = createFCFS({ disk });
 
   state.next = () => {
+    if (state.priorityQueue.length > 0) {
+      const current = state.priorityQueue.shift() ?? null;
+      disk.getCurrentSegment()?.setIsDone(true);
+      disk.getCurrentSegment()?.setIsQueued(false);
+      if (current !== null) {
+        disk.jumpToPosition(current);
+      }
+      return;
+    }
+
     disk.getCurrentSegment()?.setIsDone(true);
     disk.getCurrentSegment()?.setIsQueued(false);
 

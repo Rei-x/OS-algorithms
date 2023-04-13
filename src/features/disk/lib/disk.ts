@@ -1,5 +1,6 @@
 import { proxy } from "valtio";
 import { Segment } from "./segment";
+import { settingsProxy } from "./settings";
 
 export const createDisk = ({ segments }: { segments: Segment[] }) => {
   const state = proxy({
@@ -10,6 +11,14 @@ export const createDisk = ({ segments }: { segments: Segment[] }) => {
     currentDifference: 0,
     moveAmount: 0,
     jumpToPosition: (position: number) => {
+      if (!settingsProxy.isRunning) {
+        setTimeout(() => {
+          state.jumpToPosition(position);
+        }, 500);
+
+        return;
+      }
+
       state.previousPosition = state.currentPosition;
       state.currentSegment = state.segments.at(position) ?? null;
       state.currentPosition = position;
