@@ -34,6 +34,18 @@ export const createFCFS = ({ disk }: { disk: Disk }) => {
       disk.getSegmentAtPosition(numberOnDisk)?.setIsDone(false);
       state.queue = state.queue.filter((value) => value !== numberOnDisk);
     },
+    addToPriorityQueue: (numberOnDisk: number) => {
+      disk.getSegmentAtPosition(numberOnDisk)?.setIsQueued(true);
+      disk.getSegmentAtPosition(numberOnDisk)?.setIsDone(false);
+      state.priorityQueue.push(numberOnDisk);
+    },
+    removeFromPriorityQueue: (numberOnDisk: number) => {
+      disk.getSegmentAtPosition(numberOnDisk)?.setIsQueued(false);
+      disk.getSegmentAtPosition(numberOnDisk)?.setIsDone(false);
+      state.priorityQueue = state.priorityQueue.filter(
+        (value) => value !== numberOnDisk
+      );
+    },
     disk,
   });
 

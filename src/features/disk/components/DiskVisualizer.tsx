@@ -4,6 +4,8 @@ import React from "react";
 import { FaLongArrowAltDown } from "react-icons/fa";
 import { Disk } from "../hooks/useDisk";
 import { numberOfSegments, width } from "./Settings";
+import { useSettings } from "../hooks/useSettings";
+import { Segment } from "../lib/segment";
 
 export const DiskVisualizer = ({
   queue,
@@ -13,10 +15,30 @@ export const DiskVisualizer = ({
     next: () => void;
     queue: readonly number[];
     addToQueue: (number: number) => void;
+    addToPriorityQueue: (number: number) => void;
     removeFromQueue: (number: number) => void;
+    removeFromPriorityQueue: (number: number) => void;
   };
   disk: Disk;
 }) => {
+  const settings = useSettings();
+
+  const onClickHandler = (segment: Segment) => {
+    if (segment.isQueued) {
+      if (settings.isAddingPriority) {
+        queue.removeFromPriorityQueue(segment.numberOnDisk);
+      } else {
+        queue.removeFromQueue(segment.numberOnDisk);
+      }
+    } else {
+      if (settings.isAddingPriority) {
+        queue.addToPriorityQueue(segment.numberOnDisk);
+      } else {
+        queue.addToQueue(segment.numberOnDisk);
+      }
+    }
+  };
+
   return (
     <Box position="relative">
       <motion.div
@@ -64,13 +86,7 @@ export const DiskVisualizer = ({
             }}
             cursor="pointer"
             transition="all 0.3s ease-in-out"
-            onClick={() => {
-              if (segment.isQueued) {
-                queue.removeFromQueue(segment.numberOnDisk);
-              } else {
-                queue.addToQueue(segment.numberOnDisk);
-              }
-            }}
+            onClick={() => onClickHandler(segment)}
           />
         ))}
       </Box>

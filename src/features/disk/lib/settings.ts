@@ -8,4 +8,8 @@ export const settingsProxy = proxy({
   stop: () => {
     settingsProxy.isRunning = false;
   },
+  isAddingPriority: false,
+  setAddingPriority: (value: boolean) => {
+    settingsProxy.isAddingPriority = value;
+  },
 });

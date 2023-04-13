@@ -1,15 +1,8 @@
 import { Layout } from "@/components/Layout";
-import {
-  Button,
-  Divider,
-  HStack,
-  Heading,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, HStack, Heading, Text, VStack } from "@chakra-ui/react";
 import Head from "next/head";
 import React from "react";
-import { Settings, numberOfSegments } from "../components/Settings";
+import { numberOfSegments } from "../components/Settings";
 import { useFCFS } from "../hooks/useFCFS";
 import { DiskVisualizer } from "../components/DiskVisualizer";
 import { useSSTF } from "../hooks/useSSTF";
@@ -84,7 +77,25 @@ export const Home = () => {
               </ButtonIcon>
             )}
 
-            <ButtonIcon icon={<DeleteIcon />}>Restart</ButtonIcon>
+            {!settings.isAddingPriority ? (
+              <ButtonIcon
+                onClick={() => {
+                  settings.setAddingPriority(true);
+                }}
+                icon={<DeleteIcon />}
+              >
+                Dodawanie EDF
+              </ButtonIcon>
+            ) : (
+              <ButtonIcon
+                onClick={() => {
+                  settings.setAddingPriority(false);
+                }}
+                icon={<DeleteIcon />}
+              >
+                Wyłącz EDF
+              </ButtonIcon>
+            )}
           </VStack>
         }
       >
