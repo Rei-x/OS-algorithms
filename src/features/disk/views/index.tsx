@@ -44,7 +44,22 @@ export const Home = () => {
             <Heading textAlign="left" pt="10" mb="2" size="md">
               Panel kontrolny
             </Heading>
-            <ButtonIcon icon={<SmallAddIcon boxSize={4} />}>
+            <ButtonIcon
+              icon={<SmallAddIcon boxSize={4} />}
+              onClick={() => {
+                const uniqueSegments = new Set();
+                for (let i = 0; i < 10; i++) {
+                  const segment = Math.floor(Math.random() * numberOfSegments);
+                  if (!uniqueSegments.has(segment)) {
+                    uniqueSegments.add(segment);
+                    fcfs.addToQueue(segment);
+                    sstf.addToQueue(segment);
+                    scan.addToQueue(segment);
+                    cscan.addToQueue(segment);
+                  }
+                }
+              }}
+            >
               Dużo żądań
             </ButtonIcon>
             <ButtonIcon icon={<SmallAddIcon boxSize={6} />}>
@@ -123,38 +138,9 @@ export const Home = () => {
         }
       >
         <VStack>
-          <HStack>
-            <Button
-              onClick={() => {
-                const uniqueSegments = new Set();
-                for (let i = 0; i < 10; i++) {
-                  const segment = Math.floor(Math.random() * numberOfSegments);
-                  if (!uniqueSegments.has(segment)) {
-                    uniqueSegments.add(segment);
-                    fcfs.addToQueue(segment);
-                    sstf.addToQueue(segment);
-                    scan.addToQueue(segment);
-                    cscan.addToQueue(segment);
-                  }
-                }
-              }}
-            >
-              Generate Queue
-            </Button>
-            <Button
-              colorScheme="green"
-              onClick={() => {
-                fcfs.next();
-                sstf.next();
-                sstf.next();
-                scan.next();
-                cscan.next();
-              }}
-            >
-              Start
-            </Button>
-          </HStack>
-          <Heading size="md">FCFS</Heading>
+          <Heading size="md" mt={8}>
+            FCFS
+          </Heading>
           <Text>
             Movement: {disk.moveAmount}, items in Queue {fcfs.queue.length}
           </Text>
