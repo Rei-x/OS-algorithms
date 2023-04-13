@@ -5,6 +5,8 @@ export const createCSCAN = ({ disk }: { disk: Disk }) => {
   const state = createFCFS({ disk });
 
   state.next = () => {
+    state.onNext();
+
     if (state.priorityQueue.length > 0) {
       const current = state.priorityQueue.shift() ?? null;
       disk.getCurrentSegment()?.setIsDone(true);

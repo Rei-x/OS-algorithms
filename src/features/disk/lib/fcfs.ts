@@ -6,6 +6,10 @@ export const createFCFS = ({ disk }: { disk: Disk }) => {
     queue: [] as number[],
     priorityQueue: [] as number[],
     onNext: () => {},
+    setOnNext: (onNext: () => void) => {
+      state.onNext = onNext;
+    },
+    getQueueLength: () => state.queue.length,
     next: () => {
       if (state.priorityQueue.length > 0) {
         const current = state.priorityQueue.shift() ?? null;
@@ -23,6 +27,7 @@ export const createFCFS = ({ disk }: { disk: Disk }) => {
       if (current !== null) {
         disk.jumpToPosition(current);
       }
+      state.onNext();
     },
     addToQueue: (numberOnDisk: number) => {
       disk.getSegmentAtPosition(numberOnDisk)?.setIsQueued(true);

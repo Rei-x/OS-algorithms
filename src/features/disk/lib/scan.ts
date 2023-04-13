@@ -7,6 +7,8 @@ export const createSCAN = ({ disk }: { disk: Disk }) => {
   let direction = "up";
 
   state.next = () => {
+    state.onNext();
+
     if (state.priorityQueue.length > 0) {
       const current = state.priorityQueue.shift() ?? null;
       disk.getCurrentSegment()?.setIsDone(true);

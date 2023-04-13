@@ -25,6 +25,8 @@ export const Home = () => {
 
   const settings = useSettings();
 
+  const allQueues = [fcfs, sstf, scan, cscan];
+
   return (
     <>
       <Head>
@@ -48,7 +50,28 @@ export const Home = () => {
             <ButtonIcon icon={<SmallAddIcon boxSize={6} />}>
               Jedno żądanie na raz
             </ButtonIcon>
-            <ButtonIcon icon={<SmallAddIcon boxSize={8} />}>
+            <ButtonIcon
+              onClick={() => {
+                allQueues.forEach((queue) => {
+                  queue.addToQueue(0);
+                  queue.addToQueue(1);
+                  queue.addToQueue(2);
+                  queue.addToQueue(3);
+
+                  queue.setOnNext(() => {
+                    let current = 0;
+
+                    if (queue.getQueueLength() < 4) {
+                      queue.addToQueue(current);
+                      current = (current + 1) % 4;
+                    }
+                  });
+
+                  queue.addToQueue(90);
+                });
+              }}
+              icon={<SmallAddIcon boxSize={8} />}
+            >
               Głodzenie procesów
             </ButtonIcon>
             {settings.isRunning ? (

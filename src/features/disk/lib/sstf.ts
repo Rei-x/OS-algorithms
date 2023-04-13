@@ -31,6 +31,7 @@ export const createSSTF = ({ disk }: { disk: Disk }) => {
     if (current !== null) {
       disk.jumpToPosition(current);
     }
+    state.onNext();
   };
 
   return state;
