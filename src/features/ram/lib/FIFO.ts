@@ -1,25 +1,23 @@
 import { Ram } from "./Ram";
 
 export class FIFO extends Ram {
-
   replaceFrame(pageId: string): string {
-    const pageTheLongestInRam = this.pages.reduce((acc, page) => {
-      if (page.id === pageId) {
-        return acc;
+    const pages = this.getPagesInFrames();
+
+    let pageTheLongestInRam = pages[0];
+    for (const page of pages) {
+      if (pageTheLongestInRam.arriveTime === null || page.arriveTime === null) {
+        throw new Error("nie dziala");
       }
 
-      if (page.arriveTime === null) {
-        return acc;
+      if (pageTheLongestInRam.arriveTime > page.arriveTime) {
+        pageTheLongestInRam = page;
       }
-
-      return page.arriveTime < (acc.arriveTime ?? Infinity) ? page : acc;
-    }, this.pages[0]);
+    }
 
     if (pageTheLongestInRam.arriveTime === null) {
       throw new Error("Frame not found");
     }
-
-    
 
     const frameToRemove = this.frames.indexOf(pageTheLongestInRam.id);
 

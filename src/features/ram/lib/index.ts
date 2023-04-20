@@ -6,7 +6,7 @@ import { LRU } from "./LRU";
 import { ALRU } from "./ALRU";
 
 const numberOfPages = 100;
-const numberOfFrames = 10;
+const numberOfFrames = 7;
 
 const requests = [] as string[];
 
@@ -16,9 +16,9 @@ const random = (min: number, max: number) => {
   return Math.floor(rng() * (max - min + 1)) + min;
 };
 
-const numberOfProcesses = 5;
-const rangeOfLocalRequests = 4;
-const numberOfRequests = 4;
+const numberOfProcesses = 15;
+const rangeOfLocalRequests = 3;
+const numberOfRequests = 1000;
 
 for (let i = 0; i < numberOfProcesses; i++) {
   const upRange = random(

@@ -31,6 +31,10 @@ export abstract class Ram {
     }
   }
 
+  protected getPagesInFrames(): Page[] {
+    return this.pages.filter((page) => this.frames.includes(page.id));
+  }
+
   loadPage(pageId: string): void {
     const page = this.pages.find((page) => page.id === pageId);
 
@@ -45,7 +49,7 @@ export abstract class Ram {
     this.frames.push(pageId);
   }
 
-  private getPage(pageId: string): Page {
+  protected getPage(pageId: string): Page {
     const page = this.pages.find((page) => page.id === pageId);
     if (!page) {
       throw new Error("Page not found");
@@ -58,10 +62,9 @@ export abstract class Ram {
     this.time++;
 
     const page = this.getPage(pageId);
-
+    page.setBit(1);
     const frame = this.frames.find((frame) => frame === pageId);
     if (frame) {
-      page.setBit(1);
       page.lastUsedTime = this.time;
 
       return frame;

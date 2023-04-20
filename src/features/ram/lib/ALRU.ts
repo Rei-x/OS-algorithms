@@ -1,37 +1,36 @@
 import { Ram } from "./Ram";
 
+let shift = 0;
+
 export class ALRU extends Ram {
   replaceFrame(pageId: string): string {
-    // console.log("Requested page: ", pageId);
-    // console.log(
-    //   "Current frames: ",
-    //   this.frames.map(
-    //     (frame) =>
-    //       `${frame}:${this.pages.find((page) => page.id === frame)?.bit}`
-    //   )
-    // );
+    const pages = this.getPagesInFrames();
 
-    const pageTheLongestInRam = this.pages.find((page) => page.bit === 0) ?? {
-      id: this.frames[0],
-      reset: () => null,
-    };
-    pageTheLongestInRam.reset();
+    let pageTheLongestInRam = pages[0];
+
+    for (let i = pages.length - 1; i > 0; i--) {
+      const page = pages[i];
+      pageTheLongestInRam = page;
+      if (page.bit === 0) {
+        break;
+      }
+    }
+
+    // console.log("Requested page: ", pageId);
+    // console.log("Current frames: ", this.frames);
+    // console.log("Frame to remove: ", pageTheLongestInRam.id);
 
     const frameToRemove = this.frames.indexOf(pageTheLongestInRam.id);
 
-    // if (frameToRemove === -1) {
-    //   console.error("wtf??");
-    // }
+    if (frameToRemove === -1) {
+      throw new Error("baaad");
+    }
 
-    this.frames[frameToRemove === -1 ? 0 : frameToRemove] = pageId;
+    this.frames[frameToRemove] = pageId;
 
-    this.frames.forEach((frame) =>
-      this.pages.find((page) => page.id === frame)?.setBit(0)
-    );
+    this.pages.forEach((page) => page.setBit(0));
 
     const newPage = this.pages.find((page) => page.id === pageId);
-
-    // console.log("Frame to remove: ", pageTheLongestInRam.id);
 
     if (!newPage) {
       throw new Error("Page not found");

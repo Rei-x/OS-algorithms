@@ -5,7 +5,6 @@ export class Page {
   lastUsedTime: number | null;
   bit: -1 | 0 | 1;
 
-
   constructor(id: string) {
     this.id = id;
     this.arriveTime = null;
