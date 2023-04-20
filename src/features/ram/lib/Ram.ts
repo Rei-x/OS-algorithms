@@ -12,7 +12,11 @@ export abstract class Ram {
 
   requests: string[];
 
-  constructor(numberOfPages: number, numberOfFrames: number, requests: string[]) {
+  constructor(
+    numberOfPages: number,
+    numberOfFrames: number,
+    requests: string[]
+  ) {
     this.numberOfPages = numberOfPages;
     this.numberOfFrames = numberOfFrames;
     this.pages = [];
@@ -37,21 +41,27 @@ export abstract class Ram {
     this.pageFault();
     page.arriveTime = this.time;
     page.lastUsedTime = this.time;
-    page.bit = 1;
+    page.setBit(1);
     this.frames.push(pageId);
   }
 
-  getFrame(pageId: string): string {
-    this.time++;
-
+  private getPage(pageId: string): Page {
     const page = this.pages.find((page) => page.id === pageId);
     if (!page) {
       throw new Error("Page not found");
     }
 
+    return page;
+  }
+
+  getFrame(pageId: string): string {
+    this.time++;
+
+    const page = this.getPage(pageId);
+
     const frame = this.frames.find((frame) => frame === pageId);
     if (frame) {
-      page.bit = 1;
+      page.setBit(1);
       page.lastUsedTime = this.time;
 
       return frame;
@@ -80,5 +90,4 @@ export abstract class Ram {
   }
 
   abstract replaceFrame(pageId: string): string;
-  
 }
