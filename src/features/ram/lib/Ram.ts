@@ -7,6 +7,7 @@ export abstract class Ram {
 
   pages: Page[];
   numberOfPageFaults: number;
+  numberOfProcessedRequests: number;
 
   frames: string[];
 
@@ -22,6 +23,7 @@ export abstract class Ram {
     this.pages = [];
     this.frames = [];
     this.numberOfPageFaults = 0;
+    this.numberOfProcessedRequests = 0;
     this.time = 0;
 
     this.requests = requests;
@@ -76,7 +78,6 @@ export abstract class Ram {
     }
 
     this.pageFault();
-
     page.arriveTime = this.time;
     page.lastUsedTime = this.time;
     return this.replaceFrame(pageId);
@@ -87,9 +88,23 @@ export abstract class Ram {
   }
 
   processRequests(): void {
-    this.requests.forEach((request) => {
-      this.getFrame(request);
-    });
+    this.requests.forEach(this.processRequest);
+  }
+
+  processRequest(): void {
+    const frame = this.requests.shift();
+
+    if (!frame) {
+      throw new Error("Frame not found");
+    }
+
+    this.numberOfProcessedRequests++;
+
+    this.getFrame(frame);
+  }
+
+  getPageFaultRatio(): number {
+    return this.numberOfPageFaults / this.numberOfProcessedRequests;
   }
 
   abstract replaceFrame(pageId: string): string;

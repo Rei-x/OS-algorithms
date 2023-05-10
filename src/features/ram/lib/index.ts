@@ -34,11 +34,11 @@ for (let i = 0; i < numberOfProcesses; i++) {
 
 const strategies = [FIFO, RAND, OPT, LRU, ALRU];
 
-console.log(requests);
-
 strategies.forEach((Strategy) => {
   const ram = new Strategy(numberOfPages, numberOfFrames, requests);
   ram.processRequests();
   console.log(Strategy.name);
   console.log(ram.numberOfPageFaults);
 });
+
+export { LRU };
