@@ -1,11 +1,14 @@
 import { LRU } from "@/features/ram/lib/LRU";
 import seedrandom from "seedrandom";
-
-const numberOfPages = 1000;
+import { equalAllocation } from "./equal";
+import { proportionalAllocation } from "./proportional";
+import { pageFaultRateControl } from "./pageFaultRateControl";
+import { segmentControl } from "./segmentControl";
+import chalk from "chalk";
 
 const rng = seedrandom("pieski i koteczki");
 
-const random = (min: number, max: number) => {
+export const random = (min: number, max: number) => {
   return Math.floor(rng() * (max - min + 1)) + min;
 };
 
@@ -25,21 +28,22 @@ const generateRequestsForProcess = ({
   const downRange = upRange - rangeOfLocalRequests;
 
   for (let i = 0; i < numberOfRequests; i++) {
-    requests.push(random(downRange, upRange).toString());
+    requests.push(random(downRange, upRange - 1).toString());
   }
 
   return requests;
 };
 
-const maxRange = 50;
-const numberOfAvailableFrames = 50;
-const numberOfProcesses = 25;
-const numberOfRequests = 10000;
-const numberOfSequences = 1;
+export const maxRange = 20;
+export const numberOfAvailableFrames = 50;
+export const numberOfProcesses = 10;
+export const numberOfPages = 100;
+const numberOfRequests = 1000;
+const numberOfSequences = 50;
 
 const processesSequence = [] as number[];
 
-const processRequestsRandomly = (
+export const processRequestsRandomly = (
   processes: LRU[],
   beforeRequest?: (process: LRU) => void
 ) => {
@@ -67,163 +71,65 @@ const processRequestsRandomly = (
 };
 const rangeOfLocalRequestsMap = [] as number[];
 
-const logging = ({ processes }: { processes: LRU[] }) => {
+export const logging = ({ processes }: { processes: LRU[] }) => {
   const totalNumberOfPageFaults = processes.reduce(
     (acc, process) => acc + process.numberOfPageFaults,
     0
   );
 
-  // processes.forEach((process, i) => {
-  //   console.log("Process number ", i + 1);
-  //   console.log("Available frames");
-  //   console.log(process.numberOfFrames);
-  //   console.log("Range");
-  //   console.log(rangeOfLocalRequestsMap.at(i));
-  //   console.log("Number of page faults");
-  //   console.log(process.numberOfPageFaults);
-  //   console.log("Page faults ratio");
-  //   console.log(process.getPageFaultRatio() * 100 + "%");
-  // });
+  const shouldLogProcesses = false;
+
+  !shouldLogProcesses ??
+    processes.slice(1, 3).forEach((process, i) => {
+      console.log("Process number ", i + 1);
+      console.log("Available frames");
+      console.log(process.numberOfFrames);
+      console.log("Range");
+      console.log(rangeOfLocalRequestsMap.at(i));
+      console.log("Number of page faults");
+      console.log(process.numberOfPageFaults);
+      console.log("Page faults ratio");
+      console.log(process.getPageFaultRatio() * 100 + "%");
+      console.log("Start of requests");
+      console.log(procesRequests.at(i)?.slice(10, 30).join(", "));
+      console.log("Highest request");
+      console.log(Math.max(...procesRequests[i].map((d) => parseInt(d))));
+      console.log("Lowest request");
+      console.log(Math.min(...procesRequests[i].map((d) => parseInt(d))));
+
+      console.log(
+        chalk.bgGreenBright("............................................")
+      );
+    });
 
   console.log("Total number of page faults");
   console.log(totalNumberOfPageFaults);
+
+  console.log("Control sum of available pages");
+  console.log(
+    processes.reduce((acc, cur) => {
+      return acc + cur.numberOfFrames;
+    }, 0)
+  );
+
+  console.log(chalk.bgYellow("--------------------------------------------"));
+  console.log("");
 };
 
-const procesRequests = Array.from({ length: numberOfProcesses }).map(() => {
-  const rangeOfLocalRequests = random(1, maxRange);
-
-  rangeOfLocalRequestsMap.push(rangeOfLocalRequests);
-
-  return generateRequestsForProcess({
-    numberOfRequests,
-    rangeOfLocalRequests,
-  });
-});
-
-const equalAllocation = () => {
-  const processes = [] as LRU[];
-
-  for (let i = 0; i < numberOfProcesses; i++) {
-    const availableFrames = Math.floor(
-      numberOfAvailableFrames / numberOfProcesses
-    );
-
-    processes.push(
-      new LRU(numberOfPages, availableFrames, [...procesRequests[i]])
-    );
-  }
-  processRequestsRandomly(processes);
-  console.log("Equal allocation");
-  logging({ processes });
-};
-
-const proportionalAllocation = () => {
-  const processes = [] as LRU[];
-
-  const rangeOfLocalRequestsMap = new Map<LRU, number>();
-
-  let leftFrames = numberOfAvailableFrames;
-
-  for (let i = 0; i < numberOfProcesses; i++) {
+export const procesRequests = Array.from({ length: numberOfProcesses }).map(
+  () => {
     const rangeOfLocalRequests = random(1, maxRange);
 
-    let framesToAllocate = Math.max(
-      1,
-      rangeOfLocalRequests + (random(1, 2) == 2 ? 1 : -1) * random(1, 5)
-    );
+    rangeOfLocalRequestsMap.push(rangeOfLocalRequests);
 
-    if (framesToAllocate + numberOfProcesses - i - 1 > leftFrames) {
-      framesToAllocate = 1;
-    }
-
-    leftFrames -= framesToAllocate;
-
-    processes.push(
-      new LRU(numberOfPages, framesToAllocate, [...procesRequests[i]])
-    );
-
-    rangeOfLocalRequestsMap.set(processes[i], rangeOfLocalRequests);
+    return generateRequestsForProcess({
+      numberOfRequests,
+      rangeOfLocalRequests,
+    });
   }
-  processRequestsRandomly(processes);
-
-  console.log("Proportional allocation");
-  logging({ processes });
-};
-
-const pageFaultRateControl = () => {
-  const processes = [] as LRU[];
-
-  const maxPF = 0.2;
-  const minPF = 0.1;
-
-  for (let i = 0; i < numberOfProcesses; i++) {
-    const availableFrames = Math.floor(
-      numberOfAvailableFrames / numberOfProcesses
-    );
-
-    processes.push(
-      new LRU(numberOfPages, availableFrames, [...procesRequests[i]])
-    );
-  }
-  let index = 0;
-  processRequestsRandomly(processes, (process) => {
-    if (process.getPageFaultRatio() > maxPF) {
-      const processWithBestPageFaultRatio = processes
-        .filter((proc) => proc.numberOfFrames > 1)
-        .sort((a, b) => a.getPageFaultRatio() - b.getPageFaultRatio())
-        .at(0);
-
-      if (!processWithBestPageFaultRatio) {
-        return;
-      }
-      if (processWithBestPageFaultRatio === process) {
-        return;
-      }
-
-      process.numberOfFrames++;
-      processWithBestPageFaultRatio.numberOfFrames--;
-
-      const newFrames = processWithBestPageFaultRatio.frames.filter(
-        (frame) => frame !== processWithBestPageFaultRatio.getLeastUsedPage().id
-      );
-
-      processWithBestPageFaultRatio.frames = newFrames;
-    }
-
-    if (process.getPageFaultRatio() < minPF) {
-      const processWithWorstPageFaultRatio = processes
-        .filter((proc) => proc.numberOfFrames > 1)
-        .sort((a, b) => b.getPageFaultRatio() - a.getPageFaultRatio())
-        .at(0);
-
-      if (!processWithWorstPageFaultRatio) {
-        console.log("nie ma xd");
-        return;
-      }
-      if (processWithWorstPageFaultRatio === process) {
-        return;
-      }
-
-      process.numberOfFrames--;
-
-      processWithWorstPageFaultRatio.numberOfFrames++;
-
-      const newFrames = process.frames.filter(
-        (frame) => frame !== process.getLeastUsedPage().id
-      );
-
-      if (process.frames.length === newFrames.length) {
-        throw new Error("nie ma xd");
-      }
-
-      process.frames = newFrames;
-    }
-  });
-  console.log("Page fault rate control");
-  logging({ processes });
-  // console.log(processes.map((process) => process));
-};
+);
 
 equalAllocation();
 proportionalAllocation();
 pageFaultRateControl();
+segmentControl();
