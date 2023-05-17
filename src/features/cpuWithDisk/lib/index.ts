@@ -4,9 +4,16 @@ import { equalAllocation } from "./equal";
 import { proportionalAllocation } from "./proportional";
 import { pageFaultRateControl } from "./pageFaultRateControl";
 import { segmentControl } from "./segmentControl";
+import Table from "cli-table";
 import chalk from "chalk";
 
 const rng = seedrandom("pieski i koteczki");
+
+const table = new Table({
+  head: ["Name", "Page faults", "% of best"],
+});
+
+const rows = [] as string[][];
 
 export const random = (min: number, max: number) => {
   return Math.floor(rng() * (max - min + 1)) + min;
@@ -41,8 +48,6 @@ export const numberOfPages = 100;
 const numberOfRequests = 1000;
 const numberOfSequences = 50;
 
-const processesSequence = [] as number[];
-
 export const processRequestsRandomly = (
   processes: LRU[],
   beforeRequest?: (process: LRU) => void
@@ -69,9 +74,15 @@ export const processRequestsRandomly = (
     }
   }
 };
-const rangeOfLocalRequestsMap = [] as number[];
+export const rangeOfLocalRequestsMap = [] as number[];
 
-export const logging = ({ processes }: { processes: LRU[] }) => {
+export const logging = ({
+  processes,
+  name,
+}: {
+  processes: LRU[];
+  name: string;
+}) => {
   const totalNumberOfPageFaults = processes.reduce(
     (acc, process) => acc + process.numberOfPageFaults,
     0
@@ -102,18 +113,18 @@ export const logging = ({ processes }: { processes: LRU[] }) => {
       );
     });
 
-  console.log("Total number of page faults");
-  console.log(totalNumberOfPageFaults);
+  // console.log("Total number of page faults");
+  // console.log(chalk.bold.bgBlack(`${totalNumberOfPageFaults}`));
 
-  console.log("Control sum of available pages");
-  console.log(
-    processes.reduce((acc, cur) => {
-      return acc + cur.numberOfFrames;
-    }, 0)
-  );
+  // // console.log("Control sum of available pages");
+  // // console.log(
+  // //   `${processes.reduce((acc, cur) => {
+  // //     return acc + cur.numberOfFrames;
+  // //   }, 0)}`
+  // // );
+  // console.log("");
 
-  console.log(chalk.bgYellow("--------------------------------------------"));
-  console.log("");
+  rows.push([name, totalNumberOfPageFaults.toString(), ""]);
 };
 
 export const procesRequests = Array.from({ length: numberOfProcesses }).map(
@@ -133,3 +144,18 @@ equalAllocation();
 proportionalAllocation();
 pageFaultRateControl();
 segmentControl();
+
+rows.sort((a, b) => {
+  return parseInt(a[1]) - parseInt(b[1]);
+});
+
+rows.forEach((row, i) => {
+  row[2] = ((parseInt(row[1]) / parseInt(rows[0][1])) * 100).toFixed(2) + "%";
+});
+
+// rows.forEach((row) => {
+//   row[2] = chalk.bold(row[2]);
+// });
+
+table.push(...rows);
+console.log(table.toString());

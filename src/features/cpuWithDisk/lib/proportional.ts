@@ -8,38 +8,55 @@ import {
   logging,
   random,
   maxRange,
+  rangeOfLocalRequestsMap,
 } from ".";
 import chalk from "chalk";
+import Table from "cli-table";
 
 export const proportionalAllocation = () => {
   const processes = [] as LRU[];
 
-  const rangeOfLocalRequestsMap = new Map<LRU, number>();
+  let leftFrames = numberOfAvailableFrames - numberOfProcesses;
 
-  let leftFrames = numberOfAvailableFrames;
+  const allWantedFrames = rangeOfLocalRequestsMap.reduce(
+    (acc, curr) => acc + curr,
+    0
+  );
+
+  const table = new Table({
+    head: ["Process", "Size", "Frames", "Percentage"],
+  });
+
+  const rows = [] as string[][];
 
   for (let i = 0; i < numberOfProcesses; i++) {
-    const rangeOfLocalRequests = random(1, maxRange);
+    const request = rangeOfLocalRequestsMap.at(i) ?? 1;
 
-    let framesToAllocate = Math.max(
-      1,
-      rangeOfLocalRequests + (random(1, 2) == 2 ? 1 : -1) * random(1, 5)
-    );
+    let framesToAllocate =
+      Math.round((request / allWantedFrames) * leftFrames) + 1;
 
-    if (framesToAllocate + numberOfProcesses - i - 1 > leftFrames) {
-      framesToAllocate = 1;
-    }
+    // console.log("Process", i);
+    // console.log("Frames needed", request);
+    // console.log("Frames allocated", framesToAllocate);
 
-    leftFrames -= framesToAllocate;
+    rows.push([
+      i.toString(),
+      request.toString(),
+      framesToAllocate.toString(),
+      `${Math.round((request / allWantedFrames) * 100)}%`,
+    ]);
 
     processes.push(
       new LRU(numberOfPages, framesToAllocate, [...procesRequests[i]])
     );
-
-    rangeOfLocalRequestsMap.set(processes[i], rangeOfLocalRequests);
   }
   processRequestsRandomly(processes);
 
-  console.log(chalk.bgRedBright("Proportional allocation"));
-  logging({ processes });
+  rows.sort((a, b) => parseInt(b[2]) - parseInt(a[2]));
+
+  rows.forEach((row) => table.push(row));
+
+  console.log(table.toString());
+
+  logging({ processes, name: "Proportional allocation" });
 };

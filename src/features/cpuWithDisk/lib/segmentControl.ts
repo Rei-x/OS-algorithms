@@ -98,6 +98,5 @@ export const segmentControl = () => {
       );
     }
   });
-  console.log(chalk.bgRedBright("Segment rate control"));
-  logging({ processes });
+  logging({ processes, name: "Segment control" });
 };

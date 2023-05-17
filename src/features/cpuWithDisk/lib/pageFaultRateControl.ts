@@ -73,7 +73,6 @@ export const pageFaultRateControl = () => {
       process.frames = newFrames;
     }
   });
-  console.log(chalk.bgRedBright("Page fault rate control"));
-  logging({ processes });
+  logging({ processes, name: "Page Fault Rate Control" });
   // console.log(processes.map((process) => process));
 };

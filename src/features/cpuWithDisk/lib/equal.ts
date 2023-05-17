@@ -22,6 +22,5 @@ export const equalAllocation = () => {
     );
   }
   processRequestsRandomly(processes);
-  console.log(chalk.bgRedBright("Equal allocation"));
-  logging({ processes });
+  logging({ processes, name: "Equal allocation" });
 };

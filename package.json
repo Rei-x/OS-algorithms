@@ -21,6 +21,7 @@
     "@types/react-dom": "18.0.11",
     "chalk": "^4.1.2",
     "chroma-js": "^2.4.2",
+    "cli-table": "^0.3.11",
     "eslint": "8.35.0",
     "eslint-config-next": "13.2.3",
     "framer-motion": "^10.0.1",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@types/chroma-js": "^2.4.0",
+    "@types/cli-table": "^0.3.1",
     "@types/jest": "^29.4.0",
     "@types/seedrandom": "^3.0.5",
     "eslint-plugin-valtio": "^0.6.1",
