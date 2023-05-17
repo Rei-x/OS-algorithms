@@ -41,12 +41,12 @@ const generateRequestsForProcess = ({
   return requests;
 };
 
-export const maxRange = 20;
-export const numberOfAvailableFrames = 50;
+export const maxRange = 8;
+export const numberOfAvailableFrames = 30;
 export const numberOfProcesses = 10;
 export const numberOfPages = 100;
 const numberOfRequests = 1000;
-const numberOfSequences = 50;
+const numberOfSequences = 30;
 
 export const processRequestsRandomly = (
   processes: LRU[],
