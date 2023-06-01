@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "ram": "tsx ./src/features/ram/lib/index.ts",
+    "cpu": "tsx ./src/features/cpuHandling/index.ts",
     "frames": "tsx ./src/features/cpuWithDisk/lib/index.ts"
   },
   "dependencies": {
